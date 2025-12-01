@@ -11,11 +11,9 @@ knitr::opts_chunk$set(echo = TRUE)
 
 ## Simulation Exercise
 
-In this project you will investigate the exponential distribution in R and compare it with the Central Limit Theorem. The exponential distribution can be simulated in R with rexp(n, lambda) where lambda is the rate parameter. The mean of exponential distribution is 1/lambda and the standard deviation is also 1/lambda. Set lambda = 0.2 for all of the simulations. You will investigate the distribution of averages of 40 exponentials. Note that you will need to do a thousand simulations.
+In this project I will investigate the exponential distribution in R and compare it with the Central Limit Theorem. I will investigate the distribution of averages of 40 exponentials simulated a thousand times. The exponential distribution will have the parameter lambda = 0.5.
 
-Illustrate via simulation and associated explanatory text the properties of the distribution of the mean of 40 exponentials. You should
-
-1. Show the sample mean and compare it to the theoretical mean of the distribution.
+1. Below I will show the sample mean and compare it to the theoretical mean of the distribution.
 
 ```{r, echo=TRUE}
 means<-numeric(length(1000)) #Initialize the array "means"
@@ -32,39 +30,39 @@ legend("topright", c("Sample distribution", "Theoretical distribution"),
        col = c("red", "blue"), lwd = 2)
 ```
 
-Sample mean = `r sampmean` and theoretical mean = 5.
+Sample mean = `r sampmean` and theoretical mean = 1/0.2 = 5.
 
 As seen in this plot, which compares the sample distribution and the theoretical distribution, the sample and theoretical means are very similar (close to 5)
 
-2. Show how variable the sample is (via variance) and compare it to the theoretical variance of the distribution.
+2. Next, I will show how variable the sample is (via variance) and compare it to the theoretical variance of the distribution.
 
 ```{r, echo=TRUE}
-sampvan<-numeric(length(1000))
-for (j in 1:length(means)) {
-  sampvan[j] <- (means[j] - mean(means))^2
+sampvan<-numeric(length(1000)) #Initialize the array sampvan (sample variance)
+for (j in 1:length(means)) { #Looping 1000 times
+  sampvan[j] <- (means[j] - mean(means))^2 #storing the difference between each mean and the mean of means
 }
 
-sampvance <- sum(sampvan)/(length(sampvan)-1)
-theovance <- ((1/0.2)^2)/40
+sampvance <- sum(sampvan)/(length(sampvan)-1) #calculating the sample variance
+theovance <- ((1/0.2)^2)/40 #theorteical variance calculation
 ```
 
 Similarly, the sample variance is `r sampvance` and the theoretical variance is `r theovance` which again, are very similar
 
-3. Show that the distribution is approximately normal.
+3. Finally, I will show that the distribution is approximately normal.
 
 To show this, let us compare how the distribution of a n=1000 exponential function looks like versus a simulation of the mean of 1000 n=40 exponential functions.
 
 ```{r, echo=TRUE}
-hist(rexp(1000, 0.2))
+hist(rexp(1000, 0.2)) #histogram of exponential function with n=1000 and lambda=0.2
 ```
 
 ```{r, echo=TRUE}
 mns = NULL
-for (i in 1 : 1000) mns = c(mns, mean(rexp(40,0.2)))
-hist(mns, main="Histogram of 1000 n=40, lambda=0.2 exponentials",freq=FALSE)
-lines(density(means),col="red",lwd=2) #overlay the density curve atop it
+for (i in 1 : 1000) mns = c(mns, mean(rexp(40,0.2))) #array of mean of exponential with n=40 and lambda = 0.2
+hist(mns, main="Histogram of 1000 n=40, lambda=0.2 exponentials",freq=FALSE) #histogram of mean of 1000 exponentials
+lines(density(means),col="red",lwd=2) #overlay the density curve atop it #density curve for that histogram
 
-curve(dnorm(x, mean=5, sd=5/sqrt(40)), add=TRUE, col="blue", lwd=2)
+curve(dnorm(x, mean=5, sd=5/sqrt(40)), add=TRUE, col="blue", lwd=2) #curve of a normal function with mean = 5 and sd = 5/sqrt(40)
 legend("topright", c("Sample distribution", "Theoretical distribution"), 
        col = c("red", "blue"), lwd = 2)
 ```
