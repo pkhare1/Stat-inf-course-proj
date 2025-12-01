@@ -2,7 +2,9 @@
 title: "Distribution simulation"
 author: "Pratik A. Khare"
 date: "2025-11-30"
-output: html_document
+output:
+  html_document: default
+  pdf_document: default
 ---
 
 ```{r setup, include=FALSE}
@@ -15,6 +17,7 @@ In this project I will investigate the exponential distribution in R and compare
 
 1. Below I will show the sample mean and compare it to the theoretical mean of the distribution.
 
+#### Code for computing sample mean and plotting the sample and theoretical distributions
 ```{r, echo=TRUE}
 means<-numeric(length(1000)) #Initialize the array "means"
 for (i in 1:1000) { #loop through 1000 times for generating the rexp function
@@ -33,9 +36,12 @@ legend("topright", c("Sample distribution", "Theoretical distribution"),
 Sample mean = `r sampmean` and theoretical mean = 1/0.2 = 5.
 
 As seen in this plot, which compares the sample distribution and the theoretical distribution, the sample and theoretical means are very similar (close to 5)
+<br><br>
+
 
 2. Next, I will show how variable the sample is (via variance) and compare it to the theoretical variance of the distribution.
 
+#### Code for computing sample and theoretical variance
 ```{r, echo=TRUE}
 sampvan<-numeric(length(1000)) #Initialize the array sampvan (sample variance)
 for (j in 1:length(means)) { #Looping 1000 times
@@ -47,15 +53,18 @@ theovance <- ((1/0.2)^2)/40 #theorteical variance calculation
 ```
 
 Similarly, the sample variance is `r sampvance` and the theoretical variance is `r theovance` which again, are very similar
+<br><br>
 
 3. Finally, I will show that the distribution is approximately normal.
 
 To show this, let us compare how the distribution of a n=1000 exponential function looks like versus a simulation of the mean of 1000 n=40 exponential functions.
 
+#### Code for plotting exponential function with n=1000
 ```{r, echo=TRUE}
 hist(rexp(1000, 0.2)) #histogram of exponential function with n=1000 and lambda=0.2
 ```
 
+#### Code for plotting the distribution of means of 1000 exponential functions and overlaying with theoretical normal distribution
 ```{r, echo=TRUE}
 mns = NULL
 for (i in 1 : 1000) mns = c(mns, mean(rexp(40,0.2))) #array of mean of exponential with n=40 and lambda = 0.2
@@ -66,5 +75,6 @@ curve(dnorm(x, mean=5, sd=5/sqrt(40)), add=TRUE, col="blue", lwd=2) #curve of a 
 legend("topright", c("Sample distribution", "Theoretical distribution"), 
        col = c("red", "blue"), lwd = 2)
 ```
+
 
 This clearly shows that the latter is a normal distribution centered about 5. Moreover upon overlaying this with a normal distribution centered about 5 and having a std dev of 5/sqrt(40) proves that the distribution of 1000 n=40, lambda=0.2 exponentials is approximately normal.

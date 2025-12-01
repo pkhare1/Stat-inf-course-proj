@@ -1,7 +1,7 @@
 ---
 title: "Basic Inferential Data Analysis"
 author: "Pratik A. Khare"
-date: "2025-12-01"
+date: "2025-11-30"
 output: html_document
 ---
 
@@ -9,22 +9,91 @@ output: html_document
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
-## R Markdown
+## Basic Inferential Data Analysis
 
-This is an R Markdown document. Markdown is a simple formatting syntax for authoring HTML, PDF, and MS Word documents. For more details on using R Markdown see <http://rmarkdown.rstudio.com>.
+1. We are going to load the dataset: ToothGrowth in R and then perform an exploratory data analysis followed by some basic summary of the data.
 
-When you click the **Knit** button a document will be generated that includes both content as well as the output of any embedded R code chunks within the document. You can embed an R code chunk like this:
-
-```{r cars}
-summary(cars)
+```{r, echo=TRUE}
+data(ToothGrowth)
 ```
 
-## Including Plots
+Let us first study the structure and the basic metadata of this dataset. ToothGrowth is a `r class(ToothGrowth)` consisting of `r nrow(ToothGrowth)` rows and `r ncol(ToothGrowth)` columns.
+The titles of the three columns are: `r names(ToothGrowth)`
 
-You can also embed plots, for example:
-
-```{r pressure, echo=FALSE}
-plot(pressure)
+The first 6 rows of ToothGrowth can be seen below:
+```{r, echo=FALSE}
+head(ToothGrowth)
 ```
 
-Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.
+and the last 6 rows can be seen below:
+```{r, echo=FALSE}
+tail(ToothGrowth)
+```
+
+The unique entries and their frequency within the supp column are:
+```{r, echo=FALSE}
+table(ToothGrowth$supp)
+```
+
+and the unique entries and their frequency within the dose column are:
+```{r, echo=FALSE}
+table(ToothGrowth$dose)
+```
+
+In summary, the metadata of ToothGrowth looks like this:
+```{r, echo=FALSE}
+str(ToothGrowth)
+```
+while the statistical summary is as follows:
+```{r, echo=FALSE}
+summary(ToothGrowth)
+```
+<br><br>
+2. Next, we will compare tooth growth by supplementation and dosage respectively using both confidence intervals, and hypothesis testing.
+
+#### Code for getting the length vectors corresponding to each supplement and then computing the CIs and p-values
+```{r, echo=TRUE}
+lenOJ = ToothGrowth$len[ToothGrowth$supp=="OJ"] #lengths corresponding to OJ
+lenVC = ToothGrowth$len[ToothGrowth$supp=="VC"] #lengths corresponding to VC
+CI <- t.test(lenOJ, lenVC, paired=FALSE, var.equal=TRUE)$conf
+pval <- t.test(lenOJ, lenVC, paired=FALSE, var.equal=TRUE)$p.value
+```
+The 95% confidence interval for the difference between the means of lengths corresponding to OJ and VC are:
+`r t.test(lenOJ, lenVC, paired=FALSE, var.equal=TRUE)$conf`
+Since this interval contains 0, we cannot conclusively prove that the tooth growth is different between the 2 supplements.
+
+We can also prove this using hypothesis testing. Let us assume that the null hypothesis (H0) states that there is no difference between the means.
+The p-value for these lengths is thus: `r t.test(lenOJ, lenVC, paired=FALSE, var.equal=TRUE)$p.value` which is greater than 0.05 or 5%, thus implying that there is a >5% chance that the observed difference is due to chance and thus we reject the null hypothesis.
+
+Let us repeat the same exercise but for dose now. Since we have three doses, we will compare the p-values and confidence intervals for each pair of groups.
+
+#### Code for getting the length vectors corresponding to each dose and then computing the CIs and p-values in a tabular format
+```{r, echo=TRUE}
+len0.5 <- ToothGrowth$len[ToothGrowth$dose == 0.5]
+len1 <- ToothGrowth$len[ToothGrowth$dose == 1]
+len2 <- ToothGrowth$len[ToothGrowth$dose == 2]
+ci_0.5v1 <- t.test(len0.5, len1, paired=FALSE, var.equal=TRUE)$conf
+pval_0.5v1 <- t.test(len0.5, len1, paired=FALSE, var.equal=TRUE)$p.value
+ci_1v2 <- t.test(len1, len2, paired=FALSE, var.equal=TRUE)$conf
+pval_1v2 <- t.test(len1, len2, paired=FALSE, var.equal=TRUE)$p.value
+ci_0.5v2 <- t.test(len0.5, len2, paired=FALSE, var.equal=TRUE)$conf
+pval_0.5v2 <- t.test(len0.5, len2, paired=FALSE, var.equal=TRUE)$p.value
+
+ci_0.5v1_str <- sprintf("%.2f to %.2f", ci_0.5v1[1], ci_0.5v1[2])
+ci_1v2_str <- sprintf("%.2f to %.2f", ci_1v2[1], ci_1v2[2])
+ci_0.5v2_str <- sprintf("%.2f to %.2f", ci_0.5v2[1], ci_0.5v2[2])
+
+tbl <- rbind(
+  "95% Conf Int" = c(ci_0.5v1_str, ci_1v2_str, ci_0.5v2_str),
+  "p-value" = c(pval_0.5v1, pval_1v2, pval_0.5v2)
+)
+
+colnames(tbl) <- c("0.5 v 1", "1 v 2", "0.5 v 2")
+knitr::kable(tbl)
+```
+
+The confidence intervals and pvalues for each of the pairwise comparisons is in the table above.
+
+Thus, each of the pairwise comparisons is significant which tells us that the dose causes a significant change in tooth growth.
+<br><br>
+The assumptions we made for this problem is that the data points are not paired and that the variance of each set of lengths is equal.
